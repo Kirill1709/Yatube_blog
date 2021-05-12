@@ -74,11 +74,13 @@ class PostPagesTests(TestCase):
         self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_client.force_login(PostPagesTests.user)
+        cache.clear()
 
     def checks_the_fields_of_the_post(self, post, expected_post):
         """Проверка ожидаемых и действительных значений."""
         post_text_0 = expected_post.text
         post_pub_date_0 = (expected_post.pub_date).replace(
+            second=0,
             microsecond=0)
         post_author_0 = expected_post.author
         post_group_0 = expected_post.group
@@ -86,6 +88,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(
             post_pub_date_0,
             dt.datetime.today().replace(
+                second=0,
                 microsecond=0)),
         self.assertEqual(post_author_0, self.user),
         self.assertEqual(post_group_0, post.group)
@@ -122,8 +125,7 @@ class PostPagesTests(TestCase):
             with self.subTest(reverse_name=reverse_name):
                 response = self.authorized_client.get(reverse_name)
                 post = response.context['page'][0]
-                expected_post = self.post_1
-                self.checks_the_fields_of_the_post(post, expected_post)
+                self.checks_the_fields_of_the_post(post, PostPagesTests.post_1)
 
     def test_post_detail_pages_show_correct_context(self):
         """Шаблон group сформирован с правильным контекстом."""
@@ -132,16 +134,14 @@ class PostPagesTests(TestCase):
                                                'post_id': '1'})
         )
         post = response.context['post']
-        expected_post = self.post_2
-        self.checks_the_fields_of_the_post(post, expected_post)
+        self.checks_the_fields_of_the_post(post, PostPagesTests.post_2)
 
     def test_post_not_equal_show_correct_context(self):
         """Проверка поста, не принадлежащего данной группе."""
         response = self.authorized_client.get(
             reverse('posts:group_posts', kwargs={'slug': 'test-slug2'}))
         post = response.context['page'][0]
-        expected_post = self.post_2
-        self.checks_the_fields_of_the_post(post, expected_post)
+        self.checks_the_fields_of_the_post(post, PostPagesTests.post_2)
 
     def test_post_image_correct_context(self):
         """Проверка наличия ожидаемого изображения в контексте
@@ -152,7 +152,7 @@ class PostPagesTests(TestCase):
                 post = response.context['page'][0]
                 self.assertEqual(post.image, PostPagesTests.post_1.image)
 
-    def test_post_image_correct_context(self):
+    def test_post_image_correct_context_in_view_page(self):
         """Проверка наличия ожидаемого изображения в контексте
         отдельного поста."""
         response = self.authorized_client.get(
@@ -171,7 +171,7 @@ class PostPagesTests(TestCase):
         self.authorized_client.get(reverse('posts:index'))
         key = make_template_fragment_key('index_page')
         result = cache.get(key)
-        self.assertNotEqual(result, None)
+        self.assertIsNotNone(result)
 
 
 class PaginatorViewsTest(TestCase):

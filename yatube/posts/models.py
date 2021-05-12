@@ -40,15 +40,22 @@ class Group(models.Model):
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,
-                             related_name='comments', null=True)
+                             related_name='comments', null=True,
+                             verbose_name="Пост")
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name="comments", null=True)
-    text = models.TextField()
+                               related_name="comments", null=True,
+                               verbose_name="Автор")
+    text = models.TextField(verbose_name="Текст")
     created = models.DateTimeField(auto_now_add=True)
 
 
 class Follow(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
-                             related_name="follower")
+                             related_name="follower",
+                             verbose_name="Подписчик")
     author = models.ForeignKey(User, on_delete=models.CASCADE,
-                               related_name="following")
+                               related_name="following",
+                               verbose_name="Блогер")
+
+    class Meta:
+        unique_together = ['user', 'author']

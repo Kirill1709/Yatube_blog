@@ -7,8 +7,8 @@ from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
-from posts.forms import PostForm
 
+from ..forms import PostForm
 from ..models import Comment, Follow, Group, Post
 
 User = get_user_model()
@@ -133,26 +133,30 @@ class SubscriptionsFormTest(TestCase):
     def test_autorized_client_subscribe(self):
         """Проверка возможности подписки одного пользователя на другого."""
         follow_count = Follow.objects.filter(
-            user=self.user_3, author=self.user_2).count()
+            user=SubscriptionsFormTest.user_3,
+            author=SubscriptionsFormTest.user_2).count()
         self.authorized_client_3.post(
             reverse('posts:profile_follow', kwargs={
-                'username': self.user_2.username}),
+                'username': SubscriptionsFormTest.user_2.username}),
             follow=True
         )
         self.assertEqual(Follow.objects.filter(
-            user=self.user_3, author=self.user_2).count(), follow_count + 1)
+            user=SubscriptionsFormTest.user_3,
+            author=SubscriptionsFormTest.user_2).count(), follow_count + 1)
 
     def test_autorized_client_unsubscribe(self):
         """Проверка возможности отписки."""
         follow_count = Follow.objects.filter(
-            user=self.user_1, author=self.user_2).count()
+            user=SubscriptionsFormTest.user_1,
+            author=SubscriptionsFormTest.user_2).count()
         self.authorized_client_1.post(
             reverse('posts:profile_unfollow', kwargs={
-                'username': self.user_2.username}),
+                'username': SubscriptionsFormTest.user_2.username}),
             follow=True
         )
         self.assertEqual(Follow.objects.filter(
-            user=self.user_1, author=self.user_2).count(), follow_count - 1)
+            user=SubscriptionsFormTest.user_1,
+            author=SubscriptionsFormTest.user_2).count(), follow_count - 1)
 
     def test_displaying_a_post_for_subscribed_users(self):
         """Пост отображается у автора поста и подсписанного на
@@ -166,8 +170,8 @@ class SubscriptionsFormTest(TestCase):
         form_data = {
             'text': 'Тестовый текст2',
             'pub_date': dt.datetime.today(),
-            'author': self.user_2,
-            'group': self.group.id,
+            'author': SubscriptionsFormTest.user_2,
+            'group': SubscriptionsFormTest.group.id,
         }
         self.authorized_client_2.post(
             reverse('posts:new_post'),
@@ -186,29 +190,35 @@ class SubscriptionsFormTest(TestCase):
     def test_autorized_client_can_post_comment(self):
         """Авторизованный пользователь может оставить комментарий
         под постом."""
-        comment_count = Comment.objects.all().count()
+        comment_count = Comment.objects.filter(
+            post=SubscriptionsFormTest.post.id).count()
         form_data = {
             'text': 'Тестовый текст2',
         }
         self.authorized_client_3.post(
             reverse('posts:add_comment', kwargs={
-                'username': self.user_1.username, 'post_id': self.post.id}),
+                'username': SubscriptionsFormTest.user_1.username,
+                'post_id': SubscriptionsFormTest.post.id}),
             data=form_data,
             follow=True
         )
-        self.assertEqual(Comment.objects.all().count(), comment_count + 1)
+        self.assertEqual(Comment.objects.filter(
+            post=SubscriptionsFormTest.post.id).count(), comment_count + 1)
 
     def test_guest_client_cant_post_comment(self):
         """Неавторизованный пользователь не может оставить комментарий
         под постом."""
-        comment_count = Comment.objects.all().count()
+        comment_count = Comment.objects.filter(
+            post=SubscriptionsFormTest.post.id).count()
         form_data = {
             'text': 'Тестовый текст2',
         }
         self.guest_client.post(
             reverse('posts:add_comment', kwargs={
-                'username': self.user_1.username, 'post_id': self.post.id}),
+                'username': SubscriptionsFormTest.user_1.username,
+                'post_id': SubscriptionsFormTest.post.id}),
             data=form_data,
             follow=True
         )
-        self.assertEqual(Comment.objects.all().count(), comment_count)
+        self.assertEqual(Comment.objects.filter(
+            post=SubscriptionsFormTest.post.id).count(), comment_count)
