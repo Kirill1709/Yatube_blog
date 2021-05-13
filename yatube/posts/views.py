@@ -45,9 +45,9 @@ def profile(request, username):
     paginator = Paginator(user_profile.posts.all(), COUNT_POSTS)
     page_number = request.GET.get('page')
     page = paginator.get_page(page_number)
-    following = bool(Follow.objects.filter(
+    following = (request.user.is_authenticated and bool(Follow.objects.filter(
         user__username=request.user,
-        author=user_profile).count())
+        author=user_profile).count()))
     return render(
         request, 'posts/profile.html',
         {'page': page, 'user_profile': user_profile,
