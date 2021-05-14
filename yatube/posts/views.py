@@ -48,13 +48,10 @@ def profile(request, username):
     following = (request.user.is_authenticated and Follow.objects.filter(
         user__username=request.user,
         author=user_profile).exists())
-    subscribers = Follow.objects.filter(author=user_profile)
-    subscriptions = Follow.objects.filter(user=user_profile)
     return render(
         request, 'posts/profile.html',
         {'page': page, 'user_profile': user_profile,
-         'following': following, 'subscribers': subscribers,
-         'subscriptions': subscriptions})
+         'following': following})
 
 
 def post_view(request, username, post_id):
