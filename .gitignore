@@ -1,4 +1,4 @@
-yatube/media
+# yatube/media
 # yatube/static
 # yatube/posts/static
 # yatube/about/static
@@ -14,7 +14,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-dist/
+# dist/
 downloads/
 eggs/
 .eggs/
