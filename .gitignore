@@ -1,7 +1,7 @@
-# yatube/media
-# yatube/static
-# yatube/posts/static
-# yatube/about/static
+yatube/media
+yatube/static
+yatube/posts/static
+yatube/about/static
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -150,7 +150,7 @@ dmypy.json
 .mypy_cache
 
 # папки со статикой и медиа
-# static/
-# yatube/posts/static/
-# yatube/media/
+static/
+yatube/posts/static/
+yatube/media/
 
