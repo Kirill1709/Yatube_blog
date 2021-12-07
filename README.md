@@ -13,7 +13,7 @@
 - Django 2.2.6
 - SQLite
 
-### Зайдите на север и клонируйте проект 
+### Клонируйте проект 
 ```
 git clone git@github.com:Kirill1709/Yatube_blog.git
 ```
